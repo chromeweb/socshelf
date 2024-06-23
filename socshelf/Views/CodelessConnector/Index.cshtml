@@ -1,0 +1,163 @@
+﻿@{
+    ViewData["Title"] = "SOC Shelf - Codeless Connector Builder";
+}
+@model connectorUiConfig
+
+<div class="text-center">
+    <h1 class="display-4">Codeless Connector Builder</h1>
+    <p>The Codeless Connector Builder can help you create the components and templates needed to generate a new Codeless Connector for Microsoft Sentinel</p>
+</div>
+<div class="content-body">
+    The process of creating a Codeless Connector contains four steps:
+    <ul>
+        <li>[Optional] Defining the table where the data will be stored</li>
+        <li>[Optional] Creating a Data Collection Rule (DCR) to modify or format the data</li>
+        <li>Defining the connectors user interface</li>
+        <li>Defining the data connector connection rules</li>
+    </ul>
+    <div>
+        <h2>Connector Configuration</h2>
+        <p>Fill in the form below to create a new Codeless Connector</p>
+    </div>
+
+    <form asp-action="Submit" method="post">
+        <div id="uiConfigurationForm" class="box">
+            <h3>User interface defintion</h3>
+            <p>This section defines the UX information for the connector.  This is the information that is presented to the user when they are installing or configuring the connector</p>
+            <p>It consists of things such as the title or name of the connector, the publishers name, required permissions, licenses, etc.</p>
+            <p>It also includes the sample queries that are used to fetch examples of the data type's data.</p>
+            <p><label asp-for="title">Connector Title:</label><input asp-for="title" /></p>
+            <p><label asp-for="id">Connector id:</label><input asp-for="id" /></p>
+            <p><label asp-for="logo">Logo URL:</label><input asp-for="logo" /></p>
+            <p><label asp-for="publisher">Publisher Name:</label><input asp-for="publisher" /></p>
+            <p><label asp-for="descriptionMarkdown">Connector Description:</label><textarea cols="65" rows="2" asp-for="descriptionMarkdown"></textarea></p>
+            <div id="sampleQueriesSection">
+                <div id="sampleQueries" class="box">
+                    <h3>Sample Queries</h3>
+                <label>Sample queries are used to fetch examples of the data type's data.</label>
+                    <div>
+                        <label asp-for="sampleQueries[0].description">Query description: </label>
+                        <input asp-for="sampleQueries[0].description" />
+                        <label asp-for="sampleQueries[0].query">Query: </label>
+                        <input asp-for="sampleQueries[0].query" />
+                    </div>
+
+                </div>
+                <button type="button" id="addItem">Add additional sample query</button>
+                </div>
+            <div id="graphQueriesSection">
+                <div id="graphQueries" class="box">
+                    <h3>Graph Queries</h3>
+                    <label>Graph queries are used to fetch examples of the connectors data types.</label>
+                    <div>
+                        <p>The Graph Queries Table Name is the name of the table where your data resides.  After setting this value, you can later refer to it using the {{graphQueriesTableName}} token</p>
+                        <label asp-for="graphQueriesTableName">Graph Queries Table Name:</label>
+                        <input asp-for="graphQueriesTableName" />
+                    </div>
+                    <div>
+                        <p>Graph queries are used to present data ingestion from the connector over the last two weeks.  The base query is the query that will be used to fetch the data, and the metric name is the name of the metric that will be displayed in the graph</p>
+                        <p>Provide either one query for all of the data connector's data types, or a different query for each data type</p>
+                        <label asp-for="graphQueries[0].legend">Name:</label><input asp-for="graphQueries[0].legend" />
+                        <label asp-for="graphQueries[0].baseQuery">Base Query description:</label><input asp-for="graphQueries[0].baseQuery" />
+                        <label asp-for="graphQueries[0].metricName">Metric Name:</label><input asp-for="graphQueries[0].metricName" />
+                    </div>
+
+                </div>
+                    <button type="button" id="addGraphQueryItem">Add additional graph query</button>
+            </div>
+            <div id="dataTypesSection">
+                    <div id="dataTypes" class="box">
+                        <h3>Date Types</h3>
+                        <label>A list of all data types for your connector, and a query to fetch the time of the last event for each data type.  Each query must return a maximum of one (1) record</label>
+                        <div>
+                            <label asp-for="dataTypes[0].name">Name: </label><input asp-for="dataTypes[0].name" />
+                            <label asp-for="dataTypes[0].lastDataReceivedQuery">Last Data Received Query: </label><input asp-for="dataTypes[0].lastDataReceivedQuery" />
+                        </div>
+                    </div>
+                    <button type="button" id="addDataTypeQueryItem">Add additional data type query</button>
+                </div>
+            <div id="permissionsSection" class="box">
+                    <h3>Permissions</h3>
+                    <p>The information displayed under the Prerequisites section of the UI listing the permissions required to enable or disable the connector.</p>
+                    <div class="permissionsList">
+                        <div class="customPermissions">
+                            <h3>Custom Permissions</h3>
+                            <p>Describes any custom permissions required for your data connection.  Example: "My Connector API Key: My Connector API username and password is required""</p>
+                            <div id="customPermissions" class="box">
+                                <div>
+                                    @*todo*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="requiredLicenses">
+                            <h3>Required Licenses</h3>
+                            <p>Defines the required Microsoft licenses for the connector to function</p>
+                        </div>
+                        <div class="azureResourcePermissions">
+                            <h3>Azure Resource Permissions</h3>
+                        </div>
+                        <div class="tenantPermissions">
+                            <h3>Tenant Permissions</h3>
+                            <p>Defines the required permissions for the tenant.  Example: "GlobalAdmin"</p>
+                        @for (int i = 0; i < Model.permissions.Count; i++)
+                        {
+                            @Html.DropDownListFor(
+                                     m => m.permissions[i].tenant, // Specify the property to bind to
+                                     Enum.GetValues(typeof(connectorUiConfig.TenantTypes)).Cast<connectorUiConfig.TenantTypes>().Select(v => new SelectListItem
+                        {
+                            Text = v.ToString(),
+                            Value = ((int)v).ToString()
+                        }),
+                                     "Select a permission" // Default option
+                                     )
+                        }
+
+                        </div>
+
+        @*                 @Html.DropDownListFor(z => z.SelectedReportId, new SelectList(Model.ReportTypes, "Value", "Text", Model.SelectedReportId), "-- Select Report --")
+                        @Html.CheckBoxFor(model => model.IncludePhotos)
+                        @Html.LabelFor(model => model.IncludePhotos) *@
+                    </div>
+                    <button type="button" id="addPermissionItem">Add additional permission</button>
+                </div>
+        </div>
+        <button type="submit">Create Connector JSON</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var itemCount = 1;
+
+            $('#addItem').click(function () {
+                $('#sampleQueries').append('<div><label asp-for="sampleQueries[' + itemCount + '].description">Query description: </label><input name="sampleQueries[' + itemCount + '].description" /><label asp-for="sampleQueries[' + itemCount + '].query">Query: </label><input name="sampleQueries[' + itemCount + '].query" /></div>');
+                itemCount++;
+            });
+            $('#addGraphQueryItem').click(function () {
+                $('#graphQueries').append('<div><label asp-for="graphQueries[' + itemCount + '].legend">Name: </label><input name="graphQueries[' + itemCount + '].legend" /><label asp-for="graphQueries[' + itemCount + '].baseQuery">Base Query: </label><input name="graphQueries[' + itemCount + '].baseQuery" /><label asp-for="graphQueries[' + itemCount + '].metricName">Metric Name: </label><input name="graphQueries[' + itemCount + '].metricName" /></div>');
+                itemCount++;
+            });
+            $('#addDataTypeQueryItem').click(function () {
+                $('#dataTypes').append('<div><label asp-for="dataTypes[' + itemCount + '].name">Name: </label><input name="dataTypes[' + itemCount + '].name" /><label asp-for="dataTypes[' + itemCount + '].lastDataReceivedQuery">Last Data Received Query: </label><input name="dataTypes[' + itemCount + '].lastDataReceivedQuery" /></div>');
+                itemCount++;
+            });
+        });
+    </script>
+
+
+    <script>
+        $(function () {
+            $('#SelectedReportId').change(function () {
+                var value = $(this).val();
+                if (value === '1') {
+                    $('#IncludePhotos').show();
+                } else {
+                    $('#IncludePhotos').hide();
+                }
+            });
+        });
+    </script>
+
+}
