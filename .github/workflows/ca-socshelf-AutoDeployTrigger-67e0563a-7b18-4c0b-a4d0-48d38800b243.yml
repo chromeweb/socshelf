@@ -1,0 +1,47 @@
+name: Trigger auto deployment for ca-socshelf
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/ca-socshelf-AutoDeployTrigger-67e0563a-7b18-4c0b-a4d0-48d38800b243.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+      contents: read #Required when GH token is used to authenticate with private repo
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CASOCSHELF_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.CASOCSHELF_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.CASOCSHELF_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: 
+          registryUsername: ${{ secrets.CASOCSHELF_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CASOCSHELF_REGISTRY_PASSWORD }}
+          containerAppName: ca-socshelf
+          resourceGroup: rg-ContainerApps
+          imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
+          _buildArgumentsKey_: |
+            _buildArgumentsValues_
+
+
