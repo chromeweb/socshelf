@@ -3,9 +3,9 @@
 }
 @model connectorUiConfig
 
-<div class="text-center">
+<div id="headerBlock">
     <h1 class="display-4">Codeless Connector Builder</h1>
-    <p>The Codeless Connector Builder can help you create the components and templates needed to generate a new Codeless Connector for Microsoft Sentinel</p>
+    <p>The Codeless Connector Builder can help you create the template needed to generate a new Codeless Connector for Microsoft Sentinel</p>
 </div>
 <div class="content-body">
     The process of creating a Codeless Connector contains four steps:
@@ -25,28 +25,14 @@
             <h3>User interface defintion</h3>
             <p>This section defines the UX information for the connector.  This is the information that is presented to the user when they are installing or configuring the connector</p>
             <p>It consists of things such as the title or name of the connector, the publishers name, required permissions, licenses, etc.</p>
-            <p>It also includes the sample queries that are used to fetch examples of the data type's data.</p>
+            <p>It also includes the sample queries that are used to fetch examples of the data type's data, tests for connectivity, etc.</p>
             <p><label asp-for="title">Connector Title:</label><input asp-for="title" /></p>
             <p><label asp-for="id">Connector id:</label><input asp-for="id" /></p>
             <p><label asp-for="logo">Logo URL:</label><input asp-for="logo" /></p>
             <p><label asp-for="publisher">Publisher Name:</label><input asp-for="publisher" /></p>
             <p><label asp-for="descriptionMarkdown">Connector Description:</label><textarea cols="65" rows="2" asp-for="descriptionMarkdown"></textarea></p>
-            <div id="sampleQueriesSection">
-                <div id="sampleQueries" class="box">
-                    <h3>Sample Queries</h3>
-                <label>Sample queries are used to fetch examples of the data type's data.</label>
-                    <div>
-                        <label asp-for="sampleQueries[0].description">Query description: </label>
-                        <input asp-for="sampleQueries[0].description" />
-                        <label asp-for="sampleQueries[0].query">Query: </label>
-                        <input asp-for="sampleQueries[0].query" />
-                    </div>
-
-                </div>
-                <button type="button" id="addItem">Add additional sample query</button>
-                </div>
             <div id="graphQueriesSection">
-                <div id="graphQueries" class="box">
+                <div id="graphQueries" class="subSection">
                     <h3>Graph Queries</h3>
                     <label>Graph queries are used to fetch examples of the connectors data types.</label>
                     <div>
@@ -63,10 +49,24 @@
                     </div>
 
                 </div>
-                    <button type="button" id="addGraphQueryItem">Add additional graph query</button>
+                <button type="button" id="addGraphQueryItem">Add additional graph query</button>
             </div>
+            <div id="sampleQueriesSection">
+                <div id="sampleQueries" class="subSection">
+                    <h3>Sample Queries</h3>
+                <label>Sample queries are used to fetch examples of the data type's data.</label>
+                    <div>
+                        <label asp-for="sampleQueries[0].description">Query description: </label>
+                        <input asp-for="sampleQueries[0].description" />
+                        <label asp-for="sampleQueries[0].query">Query: </label>
+                        <input asp-for="sampleQueries[0].query" />
+                    </div>
+
+                </div>
+                <button type="button" id="addItem">Add additional sample query</button>
+                </div>
             <div id="dataTypesSection">
-                    <div id="dataTypes" class="box">
+                <div id="dataTypes" class="subSection">
                         <h3>Date Types</h3>
                         <label>A list of all data types for your connector, and a query to fetch the time of the last event for each data type.  Each query must return a maximum of one (1) record</label>
                         <div>
@@ -76,47 +76,76 @@
                     </div>
                     <button type="button" id="addDataTypeQueryItem">Add additional data type query</button>
                 </div>
-            <div id="permissionsSection" class="box">
+            <div id="permissionsSection" class="subSection">
                     <h3>Permissions</h3>
                     <p>The information displayed under the Prerequisites section of the UI listing the permissions required to enable or disable the connector.</p>
+                    <p></p>
                     <div class="permissionsList">
-                        <div class="customPermissions">
+                    <div id="permissionsSelectorBox"">
+                        <label>
+                            <input type="radio" name="permissionsOption" value="customPermissions" onchange="togglePermissionsSection(this.value)" />Custom Permissions
+                        </label>
+                        <label>
+                            <input type="radio" name="permissionsOption" value="requiredLicenses" onchange="togglePermissionsSection(this.value)" />Required Licences
+                        </label>
+                        <label>
+                            <input type="radio" name="permissionsOption" value="azureResourcePermissions" onchange="togglePermissionsSection(this.value)" />Azure Resources
+                        </label>
+                        <label>
+                            <input type="radio" name="permissionsOption" value="tenantPermissions" onchange="togglePermissionsSection(this.value)" />Tenant Permissions
+                        </label>
+                    </div>
+                    <div id="customPermissions" style="display:none;">
                             <h3>Custom Permissions</h3>
                             <p>Describes any custom permissions required for your data connection.  Example: "My Connector API Key: My Connector API username and password is required""</p>
-                            <div id="customPermissions" class="box">
+                            <p>Custom permissions are simply defined as a name and a description</p>
+                            
+                            <div id="customPermissionsList" class="box">
                                 <div>
-                                    @*todo*@
+                                    <label>Permission Name: </label><input name="permissions[0].name" />
+                                    <label>Permission Description: </label><input name="permissions[0].description" />
                                 </div>
                             </div>
                         </div>
-                        <div class="requiredLicenses">
+                    <div id="requiredLicenses" style="display:none;">
                             <h3>Required Licenses</h3>
-                            <p>Defines the required Microsoft licenses for the connector to function</p>
+                            <p>Defines the required Microsoft licenses (if any) for the connector to function</p>
+                            <div id="requiredLicensesList" class="box">
+                                @for (int i = 0; i < Model.permissions.Count; i++)
+                                {
+                                    @Html.DropDownListFor(
+                                             m => m.permissions[i].License, // Specify the property to bind to
+                                             Enum.GetValues(typeof(connectorUiConfig.Licenses)).Cast<connectorUiConfig.Licenses>().Select(v => new SelectListItem
+                                {
+                                    Text = v.ToString(),
+                                    Value = ((int)v).ToString()
+                                }),
+                                             "Select a permission" // Default option
+                                             )
+                                }
+                            </div>
                         </div>
-                        <div class="azureResourcePermissions">
+                    <div id="azureResourcePermissions" style="display:none;">
                             <h3>Azure Resource Permissions</h3>
                         </div>
-                        <div class="tenantPermissions">
+                    <div id="tenantPermissions" style="display:none;">
                             <h3>Tenant Permissions</h3>
-                            <p>Defines the required permissions for the tenant.  Example: "GlobalAdmin"</p>
-                        @for (int i = 0; i < Model.permissions.Count; i++)
-                        {
-                            @Html.DropDownListFor(
-                                     m => m.permissions[i].tenant, // Specify the property to bind to
-                                     Enum.GetValues(typeof(connectorUiConfig.TenantTypes)).Cast<connectorUiConfig.TenantTypes>().Select(v => new SelectListItem
-                        {
-                            Text = v.ToString(),
-                            Value = ((int)v).ToString()
-                        }),
-                                     "Select a permission" // Default option
-                                     )
-                        }
-
+                            <div id="tenantPermissionsList" class="box">
+                            <p>Defines the required permissions (if any) for the tenant.  Example: "GlobalAdmin"</p>
+                            @for (int i = 0; i < Model.permissions.Count; i++)
+                            {
+                                @Html.DropDownListFor(
+                                         m => m.permissions[i].tenant, // Specify the property to bind to
+                                         Enum.GetValues(typeof(connectorUiConfig.TenantTypes)).Cast<connectorUiConfig.TenantTypes>().Select(v => new SelectListItem
+                            {
+                                Text = v.ToString(),
+                                Value = ((int)v).ToString()
+                            }),
+                                         "Select a permission" // Default option
+                                         )
+                            }
                         </div>
-
-        @*                 @Html.DropDownListFor(z => z.SelectedReportId, new SelectList(Model.ReportTypes, "Value", "Text", Model.SelectedReportId), "-- Select Report --")
-                        @Html.CheckBoxFor(model => model.IncludePhotos)
-                        @Html.LabelFor(model => model.IncludePhotos) *@
+                        </div>
                     </div>
                     <button type="button" id="addPermissionItem">Add additional permission</button>
                 </div>
@@ -146,8 +175,71 @@
         });
     </script>
 
+    <script>
+        $(document).ready(function () {
+            var permissionCount = $('#permissionsList').children().length; // Start counting from existing items
+
+            $('#addPermission').click(function () {
+                var newPermissionHtml = '<div class="permissionItem">' +
+                    '<label>Permission Name:</label>' +
+                    '<input type="text" name="permissions[' + permissionCount + '].name" />' +
+                    '<label>Permission Description:</label>' +
+                    '<input type="text" name="permissions[' + permissionCount + '].description" />' +
+                    '</div>';
+                $('#permissionsList').append(newPermissionHtml);
+                permissionCount++; // Increment the counter for the next permission
+            });
+        });
+    </script>
+
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var selectedOption = document.querySelector('input[name="permissionsOption"]:checked').value;
+            toggleSection(selectedOption);
+        });
+    </script>
+
+
+    @*Show / Hide permissions blocks based on selection*@
+    <script>
+        function togglePermissionsSection(selectedValue) {
+            // List of all section IDs
+            var sections = ['customPermissions', 'requiredLicenses', 'azureResourcePermissions', 'tenantPermissions'];
+
+            // Loop through all section IDs
+            sections.forEach(function (sectionId) {
+                var section = document.getElementById(sectionId);
+
+                // Check if the current section matches the selected value
+                if (sectionId === selectedValue) {
+                    section.style.display = 'block'; // Show the matching section
+                } else {
+                    section.style.display = 'none'; // Hide all other sections
+                    // Clear all input values in the hidden section
+                    var inputs = section.querySelectorAll('input');
+                    inputs.forEach(function (input) {
+                        input.value = ''; // Clear the input
+                    });
+                    // Optionally, clear all textarea values in the hidden section
+                    var textareas = section.querySelectorAll('textarea');
+                    textareas.forEach(function (textarea) {
+                        textarea.value = ''; // Clear the textarea
+                    });
+                    // Optionally, reset all select elements to their first option
+                    var selects = section.querySelectorAll('select');
+                    selects.forEach(function (select) {
+                        select.selectedIndex = 0; // Reset select to its first option
+                    });
+                }
+            });
+        }
+    </script>
+
+    </script>
+
+
+@*     <script>
         $(function () {
             $('#SelectedReportId').change(function () {
                 var value = $(this).val();
@@ -158,6 +250,6 @@
                 }
             });
         });
-    </script>
+    </script> *@
 
 }

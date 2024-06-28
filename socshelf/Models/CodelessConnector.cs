@@ -27,10 +27,7 @@ namespace socshelf.Models
             _connectorUiConfig = new connectorUiConfig();
             _connectorUiConfig.sampleQueries = new List<connectorUiConfig.SampleQueries> { new connectorUiConfig.SampleQueries() };
         }
-        //public CodelessConnector(string title, string publisher, string description)
-        //{
-        //    _connectorUiConfig = new connectorUiConfig(title,publisher,description);
-        //}
+
         private connectorUiConfig _connectorUiConfig;
     }
 
@@ -166,7 +163,7 @@ namespace socshelf.Models
             {
                 this.metricName = "Total records received";
                 this.legend = "Record Count";
-                this.baseQuery = "{{graphQueriesTableName}}| count";
+                this.baseQuery = "{{graphQueriesTableName}}\n| count";
             }
             public string metricName { get; set; }
             public string legend { get; set; }
@@ -188,28 +185,31 @@ namespace socshelf.Models
         /// <summary>An object that defines how to verify if the connector is connected.</summary>
         public class ConnectivityCriteria
         {
+            /// <summary>Initializes a new instance of the <see cref="T:socshelf.Models.connectorUiConfig.ConnectivityCriteria" /> class.</summary>
+            public ConnectivityCriteria()
+            {
+                // Since this is a codeless connector, we are setting the connectivity criteria to HasDataConnectors by default
+                this.type = ConnectivityCriteriaType.HasDataConnectors;
+            }
             public ConnectivityCriteriaType type { get; set; }
 
-            public string value { get; set; }
+            public string? value { get; set; }
         }
 
-        /// <summary>The information displayed under the Prerequisites section of the UI, which lists the permissions required to enable or disable the connector.</summary>
+        /// <summary>Lists the permissions required to enable or disable the connector</summary>
         public class Permissions
         {
             public Permissions()
             {
-                this.customs = new customPermissions();
-                this.resourceProviders = new ResourceProviders();
-                this.License = Licenses.Office365;
-                this.tenant = TenantTypes.GlobalAdmin;
+
             }
-            public customPermissions customs { get; set; }
+            public customPermissions? customs { get; set; }
 
-            public ResourceProviders resourceProviders { get; set; }
+            public ResourceProviders? resourceProviders { get; set; }
 
-            public Licenses License { get; set; }
+            public Licenses? License { get; set; }
 
-            public TenantTypes tenant { get; set; }
+            public TenantTypes? tenant { get; set; }
 
         }
         public class customPermissions
