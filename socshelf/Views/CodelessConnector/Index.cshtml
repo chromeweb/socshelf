@@ -1,40 +1,110 @@
-﻿@{
+﻿﻿@{
     ViewData["Title"] = "SOC Shelf - Codeless Connector Builder";
 }
 @model connectorUiConfig
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Shelf - Codeless Connector Builder</title>
+    <style>
+        .container {
+            display: flex;
+        }
 
-<div id="headerBlock">
-    <h1 class="display-4">Codeless Connector Builder</h1>
-    <p>The Codeless Connector Builder can help you create the template needed to generate a new Codeless Connector for Microsoft Sentinel</p>
-</div>
-<div class="content-body">
-    The process of creating a Codeless Connector contains four steps:
-    <ul>
-        <li>[Optional] Defining the table where the data will be stored</li>
-        <li>[Optional] Creating a Data Collection Rule (DCR) to modify or format the data</li>
-        <li>Defining the connectors user interface</li>
-        <li>Defining the data connector connection rules</li>
-    </ul>
-    <div>
-        <h2>Connector Configuration</h2>
-        <p>Fill in the form below to create a new Codeless Connector</p>
-    </div>
+        .sidebar {
+            width: 250px;
+            background-color: #e0f7fa; /* Light cyan background */
+            padding: 10px;
+        }
 
+            .sidebar a {
+                display: block;
+                padding: 10px;
+                cursor: pointer;
+                text-decoration: none;
+                color: #00796b; /* Teal text color */
+            }
+
+                .sidebar a.active {
+                    background-color: #b2dfdb; /* Light teal background for active links */
+                }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f1f8e9; /* Light green background */
+        }
+
+        .section {
+            display: none;
+        }
+
+            .section.active {
+                display: block;
+            }
+    </style>
+
+</head>
+<body>
     <form asp-action="Submit" method="post">
-        <div id="uiConfigurationForm" class="box">
-            <h3>User interface defintion</h3>
-            <p>This section defines the UX information for the connector.  This is the information that is presented to the user when they are installing or configuring the connector</p>
-            <p>It consists of things such as the title or name of the connector, the publishers name, required permissions, licenses, etc.</p>
-            <p>It also includes the sample queries that are used to fetch examples of the data type's data, tests for connectivity, etc.</p>
-            <p><label asp-for="title">Connector Title:</label><input asp-for="title" /></p>
-            <p><label asp-for="id">Connector id:</label><input asp-for="id" /></p>
-            <p><label asp-for="logo">Logo URL:</label><input asp-for="logo" /></p>
-            <p><label asp-for="publisher">Publisher Name:</label><input asp-for="publisher" /></p>
-            <p><label asp-for="descriptionMarkdown">Connector Description:</label><textarea cols="65" rows="2" asp-for="descriptionMarkdown"></textarea></p>
-            <div id="graphQueriesSection">
-                <div id="graphQueries" class="subSection">
-                    <h3>Graph Queries</h3>
-                    <label>Graph queries are used to fetch examples of the connectors data types.</label>
+        <div class="container">
+            <div class="sidebar">
+                <a href="#" class="section-link" data-section="instructions" role="button" tabindex="0" aria-controls="uiConfiguration">Instructions</a>
+                <a href="#" class="section-link" data-section="uiConfiguration" role="button" tabindex="0" aria-controls="uiConfiguration">UI Configuration</a>
+                <a href="#" class="section-link" data-section="graphQueries" role="button" tabindex="0" aria-controls="graphQueries">Graph Queries</a>
+                <a href="#" class="section-link" data-section="sampleQueries" role="button" tabindex="0" aria-controls="sampleQueries">Sample Queries</a>
+                <a href="#" class="section-link" data-section="dataTypes" role="button" tabindex="0" aria-controls="dataTypes">Data Types</a>
+                <a href="#" class="section-link" data-section="customPermissions" role="button" tabindex="0" aria-controls="customPermissions">Custom Permissions</a>
+                <a href="#" class="section-link" data-section="resourceProviderPermissions" role="button" tabindex="0" aria-controls="resourceProviderPermissions">Resource Provider Permissions</a>
+                <a href="#" class="section-link" data-section="licensePermissions" role="button" tabindex="0" aria-controls="licensePermissions">Required Licenses</a>
+                <a href="#" class="section-link" data-section="tenantPermissions" role="button" tabindex="0" aria-controls="tenantPermissions">Tenant Permissions</a>
+                <a href="#" class="section-link" data-section="instructionSteps" role="button" tabindex="0" aria-controls="instructionSteps">Instruction Steps</a>
+                <a href="#" class="section-link" data-section="authentication" role="button" tabindex="0" aria-controls="authentication">Authentication</a>
+            </div>
+            <div class="content">
+                <div id="instructions" class="section">
+                    <h2>Instructions</h2>
+                    <p>The Codeless Connector Builder can help you create the template needed to generate a new Codeless Connector for Microsoft Sentinel</p>
+
+                    The process of creating a Codeless Connector contains four steps:
+                    <ul>
+                        <li>[Optional] Defining the table where the data will be stored</li>
+                        <li>[Optional] Creating a Data Collection Rule (DCR) to modify or format the data</li>
+                        <li>Defining the connectors user interface</li>
+                        <li>Defining the data connector connection rules</li>
+                    </ul>
+                        <p>The first two optional items are defined in Microsoft Sentinel and out of scope of this tool.  The Codeless Connector Builder can help with the rest.  Simply step through the sections on the left, fill in the blanks, and then click the "Generate CCP" button.</p>
+                        <p>Please note, there are some values that are pre-filled as examples.  Feel free to change those as needed</p>
+                </div>
+                <div id="uiConfiguration" class="section">
+                    <h2>UI Configuration</h2>
+                    <!-- Fields for UI Configuration -->
+                        <h3>User interface defintion</h3>
+                        <p>This section defines the UX information for the connector.  This is the information that is presented to the user when they are installing or configuring the connector</p>
+                        <p>It consists of things such as the title or name of the connector, the publishers name, required permissions, licenses, etc.</p>
+                        <p>It also includes the sample queries that are used to fetch examples of the data type's data, tests for connectivity, etc.</p>
+                        <p><label asp-for="title">Connector Title:</label><input asp-for="title" /></p>
+                        <p><label asp-for="id">Connector id:</label><input asp-for="id" /></p>
+                        <p><label asp-for="logo">Logo URL:</label><input asp-for="logo" /></p>
+                        <p><label asp-for="publisher">Publisher Name:</label><input asp-for="publisher" /></p>
+                        <p><label asp-for="descriptionMarkdown">Connector Description:</label><textarea cols="65" rows="2" asp-for="descriptionMarkdown"></textarea></p>
+                </div>
+                <div id="sampleQueries" class="section">
+                            <h3>Sample Queries</h3>
+                            <p>Sample queries are used to fetch examples of the data type's data.</p>
+                            <div>
+                                <label asp-for="sampleQueries[0].description">Query description: </label>
+                                <input asp-for="sampleQueries[0].description" />
+                                <label asp-for="sampleQueries[0].query">Query: </label>
+                                <input asp-for="sampleQueries[0].query" />
+                            </div>
+                        <button type="button" id="addItem">Add additional sample query</button>
+                </div>
+                <div id="graphQueries" class="section">
+                    <h2>Graph Queries</h2>
+                    <p>Graph queries are used to fetch examples of the connectors data types.</p>
                     <div>
                         <p>The Graph Queries Table Name is the name of the table where your data resides.  After setting this value, you can later refer to it using the {{graphQueriesTableName}} token</p>
                         <label asp-for="graphQueriesTableName">Graph Queries Table Name:</label>
@@ -47,209 +117,259 @@
                         <label asp-for="graphQueries[0].baseQuery">Base Query description:</label><input asp-for="graphQueries[0].baseQuery" />
                         <label asp-for="graphQueries[0].metricName">Metric Name:</label><input asp-for="graphQueries[0].metricName" />
                     </div>
-
+                    <button type="button" id="addGraphQueryItem">Add additional graph query</button>
                 </div>
-                <button type="button" id="addGraphQueryItem">Add additional graph query</button>
-            </div>
-            <div id="sampleQueriesSection">
-                <div id="sampleQueries" class="subSection">
-                    <h3>Sample Queries</h3>
-                <label>Sample queries are used to fetch examples of the data type's data.</label>
-                    <div>
-                        <label asp-for="sampleQueries[0].description">Query description: </label>
-                        <input asp-for="sampleQueries[0].description" />
-                        <label asp-for="sampleQueries[0].query">Query: </label>
-                        <input asp-for="sampleQueries[0].query" />
-                    </div>
-
-                </div>
-                <button type="button" id="addItem">Add additional sample query</button>
-                </div>
-            <div id="dataTypesSection">
-                <div id="dataTypes" class="subSection">
+                <div id="dataTypes" class="section">
                         <h3>Date Types</h3>
-                        <label>A list of all data types for your connector, and a query to fetch the time of the last event for each data type.  Each query must return a maximum of one (1) record</label>
+                        <p>A list of all data types for your connector, and a query to fetch the time of the last event for each data type.  Each query must return a maximum of one (1) record</p>
                         <div>
                             <label asp-for="dataTypes[0].name">Name: </label><input asp-for="dataTypes[0].name" />
                             <label asp-for="dataTypes[0].lastDataReceivedQuery">Last Data Received Query: </label><input asp-for="dataTypes[0].lastDataReceivedQuery" />
                         </div>
-                    </div>
                     <button type="button" id="addDataTypeQueryItem">Add additional data type query</button>
                 </div>
-            <div id="permissionsSection" class="subSection">
-                    <h3>Permissions</h3>
-                    <p>The information displayed under the Prerequisites section of the UI listing the permissions required to enable or disable the connector.</p>
-                    <p></p>
-                    <div class="permissionsList">
-                    <div id="permissionsSelectorBox"">
-                        <label>
-                            <input type="radio" name="permissionsOption" value="customPermissions" onchange="togglePermissionsSection(this.value)" />Custom Permissions
-                        </label>
-                        <label>
-                            <input type="radio" name="permissionsOption" value="requiredLicenses" onchange="togglePermissionsSection(this.value)" />Required Licences
-                        </label>
-                        <label>
-                            <input type="radio" name="permissionsOption" value="azureResourcePermissions" onchange="togglePermissionsSection(this.value)" />Azure Resources
-                        </label>
-                        <label>
-                            <input type="radio" name="permissionsOption" value="tenantPermissions" onchange="togglePermissionsSection(this.value)" />Tenant Permissions
-                        </label>
+                <div id="customPermissions" class="section">
+                    <h2>Custom Permissions</h2>
+                    <div id="customPermissionsList">
+                        <!-- Dynamically added custom permissions will go here -->
                     </div>
-                    <div id="customPermissions" style="display:none;">
-                            <h3>Custom Permissions</h3>
-                            <p>Describes any custom permissions required for your data connection.  Example: "My Connector API Key: My Connector API username and password is required""</p>
-                            <p>Custom permissions are simply defined as a name and a description</p>
-                            
-                            <div id="customPermissionsList" class="box">
-                                <div>
-                                    <label>Permission Name: </label><input name="permissions[0].name" />
-                                    <label>Permission Description: </label><input name="permissions[0].description" />
-                                </div>
-                            </div>
-                        </div>
-                    <div id="requiredLicenses" style="display:none;">
-                            <h3>Required Licenses</h3>
-                            <p>Defines the required Microsoft licenses (if any) for the connector to function</p>
-                            <div id="requiredLicensesList" class="box">
-                                @for (int i = 0; i < Model.permissions.Count; i++)
-                                {
-                                    @Html.DropDownListFor(
-                                             m => m.permissions[i].License, // Specify the property to bind to
-                                             Enum.GetValues(typeof(connectorUiConfig.Licenses)).Cast<connectorUiConfig.Licenses>().Select(v => new SelectListItem
-                                {
-                                    Text = v.ToString(),
-                                    Value = ((int)v).ToString()
-                                }),
-                                             "Select a permission" // Default option
-                                             )
-                                }
-                            </div>
-                        </div>
-                    <div id="azureResourcePermissions" style="display:none;">
-                            <h3>Azure Resource Permissions</h3>
-                        </div>
-                    <div id="tenantPermissions" style="display:none;">
-                            <h3>Tenant Permissions</h3>
-                            <div id="tenantPermissionsList" class="box">
-                            <p>Defines the required permissions (if any) for the tenant.  Example: "GlobalAdmin"</p>
-                            @for (int i = 0; i < Model.permissions.Count; i++)
-                            {
-                                @Html.DropDownListFor(
-                                         m => m.permissions[i].tenant, // Specify the property to bind to
-                                         Enum.GetValues(typeof(connectorUiConfig.TenantTypes)).Cast<connectorUiConfig.TenantTypes>().Select(v => new SelectListItem
-                            {
-                                Text = v.ToString(),
-                                Value = ((int)v).ToString()
-                            }),
-                                         "Select a permission" // Default option
-                                         )
-                            }
-                        </div>
-                        </div>
-                    </div>
-                    <button type="button" id="addPermissionItem">Add additional permission</button>
+                    <button type="button" id="addCustomPermission">Add Custom Permission</button>
                 </div>
-        </div>
-        <button type="submit">Create Connector JSON</button>
-    </form>
-</div>
+                <div id="resourceProviderPermissions" class="section">
+                    <h2>Resource Provider Permissions</h2>
 
+                </div>
+                <div id="licensePermissions" class="section">
+                    <h2>Required Licenses</h2>
+                    <p>Defines the required Microsoft licenses (if any) for the connector to function</p>
+                    <div id="LicensesList">
+                        @{
+                            var licenses = Enum.GetValues(typeof(connectorUiConfig.Licenses))
+                            .Cast<connectorUiConfig.Licenses>()
+                            .Select(v => new SelectListItem
+                                    {
+                                        Text = v.ToString(),
+                                        Value = v.ToString()
+                                    })
+                            .ToList();
+                        }
+                        <label for="tenantTypes">Select Tenant Types:</label>
+                        <select asp-for="permissions.licenses" asp-items="@(licenses ?? new List<SelectListItem>())"></select>
+                    </div>
+                </div>
+                <div id="tenantPermissions" class="section">
+                    <h2>Tenant Permissions</h2>
+                    <p>Defines the required permissions (if any) for the tenant.  Example: "GlobalAdmin".  You can select multiple items if required</p>
+                        <div id="tenantPermissionsList">
+                        @{
+                            var tenantTypes = Enum.GetValues(typeof(connectorUiConfig.TenantTypes))
+                            .Cast<connectorUiConfig.TenantTypes>()
+                            .Select(v => new SelectListItem
+                                    {
+                                        Text = v.ToString(),
+                                        Value =v.ToString()
+                                    })
+                            .ToList();
+                        }
+                        <label for="tenantTypes">Select Tenant Types:</label>
+                        <select asp-for="permissions.tenant" asp-items="@(tenantTypes ?? new List<SelectListItem>())" multiple="multiple"></select>
+                        </div>
+                    </div>
+                <div id="instructionSteps" class="section">
+                    <h2>Instruction Steps</h2>
+                    <div id="instructionStepsList">
+                        @for (int i = 0; i < Model.instructionSteps.Count; i++)
+                        {
+                            <div>
+                                <label asp-for="instructionSteps[i].title">Title: </label>
+                                <input asp-for="instructionSteps[i].title" />
+                                <label asp-for="instructionSteps[i].description">Description: </label>
+                                <textarea asp-for="instructionSteps[i].description"></textarea>
+                            </div>
+                        }
+                    </div>
+                    <button type="button" id="addInstructionStep">Add Instruction Step</button>
+                </div>
+                <div id="authentication" class="section">
+                    <h2>Authentication Configuration</h2>
+                    <select id="authType" name="Authentication.Type">
+                        <option value="APIKey">API Key</option>
+                        <option value="Basic">Basic</option>
+                        <option value="OAuth2">OAuth2</option>
+                        <option value="ManagedIdentity">Managed Identity</option>
+                    </select>
+
+                    <div id="apiKeyConfig" class="auth-config">
+                        <label>Name: </label>
+                        <input name="Authentication.Name" />
+                        <label>In: </label>
+                        <input name="Authentication.In" />
+                    </div>
+
+                    <div id="basicConfig" class="auth-config">
+                        <label>Username: </label>
+                        <input name="Authentication.Username" />
+                        <label>Password: </label>
+                        <input name="Authentication.Password" />
+                    </div>
+
+                    <div id="oauth2Config" class="auth-config">
+                        <label>Authority: </label>
+                        <input name="Authentication.Authority" />
+                        <label>Client ID: </label>
+                        <input name="Authentication.ClientId" />
+                        <label>Client Secret: </label>
+                        <input name="Authentication.ClientSecret" />
+                        <label>Resource: </label>
+                        <input name="Authentication.Resource" />
+                        <label>Scope: </label>
+                        <input name="Authentication.Scope" />
+                        <label>Grant Type: </label>
+                        <input name="Authentication.GrantType" />
+                    </div>
+
+                    <div id="managedIdentityConfig" class="auth-config">
+                        <label>Resource: </label>
+                        <input name="Authentication.Resource" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    <button type="submit">Generate CCP</button>
+    </form>
+</body>
+</html>
 @section Scripts {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Custom permission objects
+            var customPermissionCount = 0;
+            document.getElementById('addCustomPermission').addEventListener('click', function () {
+                $('#customPermissionsList').append('<div><label asp-for="permissions.customs[' + customPermissionCount + '].name">Name: </label><input name="permissions.customs[' + customPermissionCount + '].name" /><label asp-for="permissions.customs[' + customPermissionCount + '].description">Description: </label><input name="permissions.customs[' + customPermissionCount + '].description" /></div>');
+                customPermissionCount++;
+            });
+
+            var sectionLinks = document.querySelectorAll('.section-link');
+            sectionLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var sectionId = this.getAttribute('data-section');
+
+                    document.querySelectorAll('.section').forEach(function (section) {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById(sectionId).classList.add('active');
+
+                    sectionLinks.forEach(function (link) {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+
+            // Activate the first section by default
+            sectionLinks[0].click();
+        });
+
         $(document).ready(function () {
             var itemCount = 1;
 
             $('#addItem').click(function () {
-                $('#sampleQueries').append('<div><label asp-for="sampleQueries[' + itemCount + '].description">Query description: </label><input name="sampleQueries[' + itemCount + '].description" /><label asp-for="sampleQueries[' + itemCount + '].query">Query: </label><input name="sampleQueries[' + itemCount + '].query" /></div>');
+                $('#sampleQueries').append(`
+                            <div>
+                                <label>Query description: </label>
+                                <input name="sampleQueries[${itemCount}].description" />
+                                <label>Query: </label>
+                                <input name="sampleQueries[${itemCount}].query" />
+                            </div>
+                        `);
                 itemCount++;
             });
+
             $('#addGraphQueryItem').click(function () {
-                $('#graphQueries').append('<div><label asp-for="graphQueries[' + itemCount + '].legend">Name: </label><input name="graphQueries[' + itemCount + '].legend" /><label asp-for="graphQueries[' + itemCount + '].baseQuery">Base Query: </label><input name="graphQueries[' + itemCount + '].baseQuery" /><label asp-for="graphQueries[' + itemCount + '].metricName">Metric Name: </label><input name="graphQueries[' + itemCount + '].metricName" /></div>');
+                $('#graphQueries').append(`
+                            <div>
+                                <label>Name: </label>
+                                <input name="graphQueries[${itemCount}].legend" />
+                                <label>Base Query: </label>
+                                <input name="graphQueries[${itemCount}].baseQuery" />
+                                <label>Metric Name: </label>
+                                <input name="graphQueries[${itemCount}].metricName" />
+                            </div>
+                        `);
                 itemCount++;
             });
+
             $('#addDataTypeQueryItem').click(function () {
-                $('#dataTypes').append('<div><label asp-for="dataTypes[' + itemCount + '].name">Name: </label><input name="dataTypes[' + itemCount + '].name" /><label asp-for="dataTypes[' + itemCount + '].lastDataReceivedQuery">Last Data Received Query: </label><input name="dataTypes[' + itemCount + '].lastDataReceivedQuery" /></div>');
+                $('#dataTypes').append(`
+                            <div>
+                                <label>Name: </label>
+                                <input name="dataTypes[${itemCount}].name" />
+                                <label>Last Data Received Query: </label>
+                                <input name="dataTypes[${itemCount}].lastDataReceivedQuery" />
+                            </div>
+                        `);
                 itemCount++;
+            });
+
+            var tenantCount = @Model.permissions.tenant?.Count ?? 0;
+
+            $('#addTenant').click(function () {
+                var newTenantHtml = `
+                            <div>
+                                <select name="permissions.tenant[${tenantCount}]">
+        @foreach (var v in Enum.GetValues(typeof(connectorUiConfig.TenantTypes)).Cast<connectorUiConfig.TenantTypes>())
+        {
+                                            <option value="@((int)v)">@v</option>
+        }
+                                </select>
+                                <button type="button" class="removeTenant" data-index="${tenantCount}">Remove</button>
+                            </div>
+                        `;
+                $('#tenantPermissionsList').append(newTenantHtml);
+                tenantCount++;
+            });
+
+            $(document).on('click', '.removeTenant', function () {
+                $(this).parent().remove();
             });
         });
     </script>
-
     <script>
         $(document).ready(function () {
-            var permissionCount = $('#permissionsList').children().length; // Start counting from existing items
+            var instructionStepCount = @Model.instructionSteps.Count;
 
-            $('#addPermission').click(function () {
-                var newPermissionHtml = '<div class="permissionItem">' +
-                    '<label>Permission Name:</label>' +
-                    '<input type="text" name="permissions[' + permissionCount + '].name" />' +
-                    '<label>Permission Description:</label>' +
-                    '<input type="text" name="permissions[' + permissionCount + '].description" />' +
-                    '</div>';
-                $('#permissionsList').append(newPermissionHtml);
-                permissionCount++; // Increment the counter for the next permission
+            $('#addInstructionStep').click(function () {
+                $('#instructionStepsList').append(`
+                            <div>
+                                <label>Title: </label>
+                                <input name="InstructionSteps[${instructionStepCount}].Title" />
+                                <label>Description: </label>
+                                <textarea name="InstructionSteps[${instructionStepCount}].Description"></textarea>
+                            </div>
+                        `);
+                instructionStepCount++;
             });
+
+            // Existing JavaScript code...
         });
     </script>
-
-
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var selectedOption = document.querySelector('input[name="permissionsOption"]:checked').value;
-            toggleSection(selectedOption);
+        $(document).ready(function () {
+            $('#authType').change(function () {
+                $('.auth-config').hide();
+                var selectedType = $(this).val();
+                if (selectedType === 'APIKey') {
+                    $('#apiKeyConfig').show();
+                } else if (selectedType === 'Basic') {
+                    $('#basicConfig').show();
+                } else if (selectedType === 'OAuth2') {
+                    $('#oauth2Config').show();
+                } else if (selectedType === 'ManagedIdentity') {
+                    $('#managedIdentityConfig').show();
+                }
+            }).change();
         });
     </script>
-
-
-    @*Show / Hide permissions blocks based on selection*@
-    <script>
-        function togglePermissionsSection(selectedValue) {
-            // List of all section IDs
-            var sections = ['customPermissions', 'requiredLicenses', 'azureResourcePermissions', 'tenantPermissions'];
-
-            // Loop through all section IDs
-            sections.forEach(function (sectionId) {
-                var section = document.getElementById(sectionId);
-
-                // Check if the current section matches the selected value
-                if (sectionId === selectedValue) {
-                    section.style.display = 'block'; // Show the matching section
-                } else {
-                    section.style.display = 'none'; // Hide all other sections
-                    // Clear all input values in the hidden section
-                    var inputs = section.querySelectorAll('input');
-                    inputs.forEach(function (input) {
-                        input.value = ''; // Clear the input
-                    });
-                    // Optionally, clear all textarea values in the hidden section
-                    var textareas = section.querySelectorAll('textarea');
-                    textareas.forEach(function (textarea) {
-                        textarea.value = ''; // Clear the textarea
-                    });
-                    // Optionally, reset all select elements to their first option
-                    var selects = section.querySelectorAll('select');
-                    selects.forEach(function (select) {
-                        select.selectedIndex = 0; // Reset select to its first option
-                    });
-                }
-            });
-        }
-    </script>
-
-    </script>
-
-
-@*     <script>
-        $(function () {
-            $('#SelectedReportId').change(function () {
-                var value = $(this).val();
-                if (value === '1') {
-                    $('#IncludePhotos').show();
-                } else {
-                    $('#IncludePhotos').hide();
-                }
-            });
-        });
-    </script> *@
-
 }

@@ -7,6 +7,9 @@ namespace socshelf.Controllers
 {
     public class CodelessConnectorController : Controller
     {
+        public List<string> TenantTypes { get; set; } = Enum.GetNames(typeof(connectorUiConfig.TenantTypes)).ToList();
+        public List<string> Licenses { get; set; } = Enum.GetNames(typeof(connectorUiConfig.Licenses)).ToList();
+
         public IActionResult Index()
         {
             var model = new connectorUiConfig
@@ -14,13 +17,16 @@ namespace socshelf.Controllers
                 sampleQueries = new List<connectorUiConfig.SampleQueries> { new connectorUiConfig.SampleQueries() },
                 graphQueries = new List<connectorUiConfig.GraphQueries> { new connectorUiConfig.GraphQueries() },
                 dataTypes = new List<connectorUiConfig.DataTypes> { new connectorUiConfig.DataTypes() },
-                connectivityCriteria = new List<connectorUiConfig.ConnectivityCriteria> { new connectorUiConfig.ConnectivityCriteria()},
-                permissions = new List<connectorUiConfig.Permissions> { new connectorUiConfig.Permissions() },
+                connectivityCriteria = new List<connectorUiConfig.ConnectivityCriteria> { new connectorUiConfig.ConnectivityCriteria() },
+                permissions = new connectorUiConfig.Permissions(), // { new connectorUiConfig.Permissions() },
                 instructionSteps = new List<connectorUiConfig.InstructionSteps> { new connectorUiConfig.InstructionSteps() }
-                
             };
             //Since this is a codeless connector, we are setting the connectivity criteria to HasDataConnectors by default
-            model.connectivityCriteria[0].type = connectorUiConfig.ConnectivityCriteriaType.HasDataConnectors;
+            //TODO: Add more options for connectivity criteria
+            model.connectivityCriteria[0].type = "HasDataConnectors";
+            model.connectivityCriteria[0].value = string.Empty;
+
+            
             return View(model);
         }
 

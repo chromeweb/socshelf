@@ -4,15 +4,17 @@
 // Created          : 06-04-2024
 //
 // Last Modified By : MattEgen
-// Last Modified On : 06-05-2024
+// Last Modified On : 06-27-2024
 // ***********************************************************************
 // <copyright file="CodelessConnector.cs" company="socshelf">
 //     Copyright (c) . All rights reserved.
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using NuGet.Protocol.Core.Types;
 using System.Diagnostics;
 using System.Security.Policy;
+using static socshelf.Models.connectorUiConfig;
 using static socshelf.Models.connectorUiConfig.ResourceProviders;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -76,11 +78,14 @@ namespace socshelf.Models
 
         /// <summary>The information displayed under the Prerequisites section of the UI, which lists the permissions required to enable or disable the connector</summary>
         /// <value>The permissions.</value>
-        public List<Permissions>? permissions { get; set; }
+        public Permissions? permissions { get; set; }
 
         /// <summary>An array of widget parts that explain how to install the connector, and actionable controls displayed on the Instructions tab.</summary>
         /// <value>The instruction steps.</value>
         public List<InstructionSteps>? instructionSteps { get; set; }
+
+
+        public AuthenticationConfiguration Authentication { get; set; }
 
         #endregion
 
@@ -133,8 +138,11 @@ namespace socshelf.Models
             this.publisher = "Publisher Name";
             this.descriptionMarkdown = "This is a description of the connector and it supports ** markdown **";
             this.sampleQueries = new List<SampleQueries>();
-            this.graphQueries = new List<GraphQueries>();   
-
+            this.graphQueries = new List<GraphQueries>();
+            this.dataTypes = new List<DataTypes>();
+            this.permissions = new Permissions();
+            this.instructionSteps = new List<InstructionSteps>();
+            this.connectivityCriteria = new List<ConnectivityCriteria> { new ConnectivityCriteria() };
         }
 
         #endregion
@@ -189,9 +197,9 @@ namespace socshelf.Models
             public ConnectivityCriteria()
             {
                 // Since this is a codeless connector, we are setting the connectivity criteria to HasDataConnectors by default
-                this.type = ConnectivityCriteriaType.HasDataConnectors;
+                this.type = "HasDataConnectors";
             }
-            public ConnectivityCriteriaType type { get; set; }
+            public string type { get; set; }
 
             public string? value { get; set; }
         }
@@ -199,24 +207,64 @@ namespace socshelf.Models
         /// <summary>Lists the permissions required to enable or disable the connector</summary>
         public class Permissions
         {
+            /// <summary>Initializes a new instance of the <see cref="T:socshelf.Models.connectorUiConfig.Permissions" /> class.</summary>
             public Permissions()
             {
-
+                customs = new List<CustomPermissions>();
+                resourceProvider = new List<ResourceProviderPermission>();
+                licenses = new string(string.Empty);
+                tenant = new List<string>();
             }
-            public customPermissions? customs { get; set; }
 
-            public ResourceProviders? resourceProviders { get; set; }
+            public List<CustomPermissions> customs { get; set; }
+            public List<ResourceProviderPermission> resourceProvider { get; set; }
+            public string licenses { get; set; }
+            public List<string> tenant { get; set; }
 
-            public Licenses? License { get; set; }
+            public class CustomPermissions
+            {
+                public string name { get; set; }
+                public string description { get; set; }
+            }
 
-            public TenantTypes? tenant { get; set; }
+            public class ResourceProviderPermission
+            {
+                /// <summary>Initializes a new instance of the <see cref="T:socshelf.Models.connectorUiConfig.Permissions.ResourceProviderPermission" /> class.</summary>
+                public ResourceProviderPermission()
+                {
+                    Provider = Provider.Microsoft_OperationalInsights_workspaces;
+                    Scope = ResourceProvidersScope.Subscription;
+                }
+                private Provider _provider;
 
+                public Provider Provider
+                {
+                    get => _provider;
+                    set
+                    {
+                        _provider = value;
+                        PermissionsDisplayText = _provider.ToOriginalString();
+                    }
+                }
+
+                public string PermissionsDisplayText { get; private set; }
+
+                public ResourceProvidersScope Scope { get; set; }
+            }
+
+            public class LicensePermission
+            {
+                public string License { get; set; }
+                //public string LicenseDisplayText { get; set; }
+            }
+
+            public class TenantPermission
+            {
+                public TenantTypes TenantType { get; set; }
+                public string TenantDisplayText { get; set; }
+            }
         }
-        public class customPermissions
-        {
-            public string? permissionName { get; set; }
-            public string? permissionDescription { get; set; }
-        }
+
 
         /// <summary>Class resourceProviders</summary>
         public class ResourceProviders
@@ -292,5 +340,61 @@ namespace socshelf.Models
             return _map[provider];
         }
     }
+    public abstract class AuthenticationConfiguration
+    {
+        public required string Type { get; set; }
+    }
 
+
+    public class APIKeyAuthentication : AuthenticationConfiguration
+    {
+        public APIKeyAuthentication()
+        {
+            Type = "APIKey";
+            Name = string.Empty;
+            In = string.Empty;
+        }
+
+        public string Name { get; set; }
+        public string In { get; set; }
+    }
+
+    public class BasicAuthentication : AuthenticationConfiguration
+    {
+        public BasicAuthentication()
+        {
+            Type = "Basic";
+            Username = string.Empty;
+            Password = string.Empty;
+        }
+
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+    public class OAuth2Authentication : AuthenticationConfiguration
+    {
+        public OAuth2Authentication()
+        {
+            Type = "OAuth2";
+        }
+
+        public string? Authority { get; set; }
+        public string? ClientId { get; set; }
+        public string? ClientSecret { get; set; }
+        public string? Resource { get; set; }
+        public string? Scope { get; set; }
+        public string? GrantType { get; set; }
+    }
+
+    public class ManagedIdentityAuthentication : AuthenticationConfiguration
+    {
+        public ManagedIdentityAuthentication()
+        {
+            Type = "ManagedIdentity";
+            Resource = string.Empty;
+        }
+
+        public string Resource { get; set; }
+    }
 }
